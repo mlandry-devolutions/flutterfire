@@ -145,19 +145,30 @@ public class FlutterFirebaseMessagingPlugin extends BroadcastReceiver
     return taskCompletionSource.getTask();
   }
 
-  private Task<Map<String, Object>> getToken() {
+  private Task<Map<String, Object>> getToken(FirebaseApp app) {
     TaskCompletionSource<Map<String, Object>> taskCompletionSource = new TaskCompletionSource<>();
 
     cachedThreadPool.execute(
         () -> {
           try {
-            String token = Tasks.await(FirebaseMessaging.getInstance().getToken());
+            if (app != null) {
+            String token = Tasks.await(app.getToken());
             taskCompletionSource.setResult(
                 new HashMap<String, Object>() {
                   {
                     put("token", token);
                   }
                 });
+            } else {
+                          String token = Tasks.await(FirebaseMessaging.getInstance().getToken());
+            taskCompletionSource.setResult(
+                new HashMap<String, Object>() {
+                  {
+                    put("token", token);
+                  }
+                });
+            }
+
           } catch (Exception e) {
             taskCompletionSource.setException(e);
           }
@@ -441,7 +452,7 @@ public class FlutterFirebaseMessagingPlugin extends BroadcastReceiver
         methodCallTask = deleteToken();
         break;
       case "Messaging#getToken":
-        methodCallTask = getToken();
+        methodCallTask = getToken((FirebaseApp) call.arguments()[0]);
         break;
       case "Messaging#subscribeToTopic":
         methodCallTask = subscribeToTopic(call.arguments());

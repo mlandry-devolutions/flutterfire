@@ -31,7 +31,7 @@ abstract class FirebaseMessagingPlatform extends PlatformInterface {
 
   /// The [FirebaseApp] this instance was initialized with.
   @protected
-  final FirebaseApp? appInstance;
+  FirebaseApp? appInstance;
 
   /// Returns the [FirebaseApp] for the current instance.
   FirebaseApp get app {
@@ -107,7 +107,8 @@ abstract class FirebaseMessagingPlatform extends PlatformInterface {
   /// [FirebaseApp] instance is required by the user.
   @protected
   FirebaseMessagingPlatform delegateFor({required FirebaseApp app}) {
-    throw UnimplementedError('delegateFor() is not implemented');
+    appInstance = app;
+    // throw UnimplementedError('delegateFor() is not implemented');
   }
 
   /// Sets any initial values on the instance.
